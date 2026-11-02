@@ -4,6 +4,7 @@ import 'firebase_options.dart';
 
 import 'app_routes.dart';
 import 'screens/welcome.dart';
+import 'screens/sign_up.dart';
 
 void main () async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const WelcomeScreen(),
+      home: const SignUp(),
       routes: AppRoutes.routes,
       
     );
