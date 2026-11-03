@@ -50,19 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBWqMkZ40JFbUZfpF6unetoQaUtCTYIgE8',
-    appId: '1:131751789961:android:bc4b4d671f1546f13c8d58',
-    messagingSenderId: '131751789961',
-    projectId: 'campus-report-9712e',
-    storageBucket: 'campus-report-9712e.firebasestorage.app',
+    apiKey: String.fromEnvironment('apiKey'),
+    appId: String.fromEnvironment('appId'),
+    messagingSenderId: String.fromEnvironment('messagingSenderId'),
+    projectId: String.fromEnvironment('projectId'),
+    storageBucket: String.fromEnvironment('storageBucket'),
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBZA_ao_G6QsCIbn7qyQlaAX5stByAYgFY',
-    appId: '1:131751789961:ios:061eb55c5c6840863c8d58',
-    messagingSenderId: '131751789961',
-    projectId: 'campus-report-9712e',
-    storageBucket: 'campus-report-9712e.firebasestorage.app',
+    apiKey: String.fromEnvironment('apiKey'),
+    appId: String.fromEnvironment('appId'),
+    messagingSenderId: String.fromEnvironment('messagingSenderId'),
+    projectId: String.fromEnvironment('projectId'),
+    storageBucket: String.fromEnvironment('storageBucket'),
     iosBundleId: 'com.example.mobileDevFormativeAssignment2',
   );
 }
