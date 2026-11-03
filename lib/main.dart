@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
+
 import 'firebase_options.dart';
 
 import 'app_routes.dart';
-import 'screens/welcome.dart';
+import 'core/constants/app_theme.dart';
 import 'screens/sign_up.dart';
 
-void main () async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Firebase with auto-generated options
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } else if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp();
+  }
   runApp(const MyApp());
 }
 
@@ -23,9 +28,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
       home: const SignUp(),
       routes: AppRoutes.routes,
-      
     );
   }
 }
