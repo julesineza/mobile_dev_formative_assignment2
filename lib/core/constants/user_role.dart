@@ -1,6 +1,6 @@
 enum UserRole {
-  student('student','Student'),
-  staff('staff','Staff');
+  student('student', 'Student'),
+  teacher('teacher', 'Teacher');
 
   const UserRole(this.value, this.label);
 
@@ -10,8 +10,7 @@ enum UserRole {
   static UserRole fromString(String? value) {
     return UserRole.values.firstWhere(
       (role) => role.value == value,
-      orElse: () => UserRole.student, // safe fallback
+      orElse: () => UserRole.student,
     );
   }
-
 }

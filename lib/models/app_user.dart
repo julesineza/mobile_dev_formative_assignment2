@@ -29,9 +29,10 @@ class AppUser {
     );
   }
 
-  // Dart -> Firestore. No uid here: it is the document's name.
+  // Dart -> Firestore. The uid is stored as a field and used as the document ID.
   Map<String, dynamic> toMap() {
     return {
+      FirestoreKeys.uid: uid,
       FirestoreKeys.name: name,
       FirestoreKeys.email: email,
       FirestoreKeys.role: role.value,

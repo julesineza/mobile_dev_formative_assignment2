@@ -10,6 +10,7 @@ class FirestoreKeys {
   static const String updatedAt = 'updatedAt';
 
   // User fields
+  static const String uid = 'uid';
   static const String name = 'name';
   static const String email = 'email';
   static const String role = 'role';
