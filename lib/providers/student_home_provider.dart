@@ -33,12 +33,12 @@ class DashboardReport {
 }
 
 class StudentHomeProvider extends ChangeNotifier {
-  StudentHomeProvider({
-    FirebaseAuth? auth,
-    FirebaseFirestore? firestore,
-  })  : _auth = auth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance {
-    _authSubscription = _auth.authStateChanges().listen(_handleAuthStateChanged);
+  StudentHomeProvider({FirebaseAuth? auth, FirebaseFirestore? firestore})
+    : _auth = auth ?? FirebaseAuth.instance,
+      _firestore = firestore ?? FirebaseFirestore.instance {
+    _authSubscription = _auth.authStateChanges().listen(
+      _handleAuthStateChanged,
+    );
   }
 
   final FirebaseAuth _auth;
@@ -84,6 +84,7 @@ class StudentHomeProvider extends ChangeNotifier {
       notifyListeners();
       return;
     }
+    await _issuesSubscription?.cancel();
     _listenToIssues(user.uid);
   }
 
@@ -134,18 +135,23 @@ class StudentHomeProvider extends ChangeNotifier {
     _issuesSubscription = _firestore
         .collection(FirestoreKeys.issues)
         .where(FirestoreKeys.reportedBy, isEqualTo: uid)
-        .orderBy(FirestoreKeys.createdAt, descending: true)
         .snapshots()
         .listen(
           (snapshot) {
-            _issues = snapshot.docs
-                .map((doc) => Issue.fromMap(doc.data(), doc.id))
-                .toList();
+            _issues =
+                snapshot.docs
+                    .map((doc) => Issue.fromMap(doc.data(), doc.id))
+                    .toList()
+                  ..sort(
+                    (first, second) =>
+                        second.createdAt.compareTo(first.createdAt),
+                  );
             _isLoading = false;
             _errorMessage = null;
             notifyListeners();
           },
           onError: (Object error) {
+            debugPrint('Unable to load reports for student $uid: $error');
             _issues = const [];
             _isLoading = false;
             _errorMessage =
@@ -179,8 +185,9 @@ class StudentHomeProvider extends ChangeNotifier {
     };
 
     final title = issue.title.trim().isEmpty ? 'Untitled report' : issue.title;
-    final location =
-        issue.location.trim().isEmpty ? 'Campus location not provided' : issue.location;
+    final location = issue.location.trim().isEmpty
+        ? 'Campus location not provided'
+        : issue.location;
 
     return DashboardReport(
       title: title,

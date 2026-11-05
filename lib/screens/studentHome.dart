@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
 import '../widgets/navbar.dart';
 
 import '../core/constants/colors.dart';
 import '../providers/student_home_provider.dart';
+import '../app_routes.dart';
 
 class StudentHome extends StatelessWidget {
   const StudentHome({super.key});
@@ -60,7 +62,6 @@ class _StudentHomeContent extends StatelessWidget {
                                 ),
                           ),
                         ),
-                        
                       ],
                     ),
                     const SizedBox(height: 28),
@@ -150,6 +151,7 @@ class _StudentHomeContent extends StatelessWidget {
     );
   }
 }
+
 class _ReportPromptCard extends StatelessWidget {
   const _ReportPromptCard();
 
@@ -164,21 +166,18 @@ class _ReportPromptCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              
-              const SizedBox(width: 17),
-              
-            ],
-          ),
+          Row(children: [const SizedBox(width: 17)]),
           const SizedBox(height: 22),
           SizedBox(
             width: double.infinity,
             height: 73,
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                final submitted = await Navigator.of(context)
+                    .pushNamed(AppRoutes.submitReport);
+                if (!context.mounted || submitted != true) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Report an issue tapped')),
+                  const SnackBar(content: Text('Your report was submitted.')),
                 );
               },
               child: const Row(
@@ -195,7 +194,6 @@ class _ReportPromptCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 21),
-    
         ],
       ),
     );
