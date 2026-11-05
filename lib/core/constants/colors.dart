@@ -11,4 +11,9 @@ class AppColors {
   static const Color secondaryText = Color(0xFF6B6F78);
   static const Color border = Color(0xFFDCE2EC);
   static const Color error = Color(0xFFB3261E);
+  static const Color success = Color(0xFF27794F);
+  static const Color warning = Color(0xFF98600D);
+  static const Color warningBackground = Color(0xFFFBF3E5);
+  static const Color primaryBackground = Color.fromARGB(255, 246, 247, 248);
+  static const Color successBackground = Color(0xFFE8F5EE);
 }

@@ -35,7 +35,7 @@ class _SignInState extends State<SignIn> {
         _emailController.text.trim(),
         _passwordController.text,
       );
-      if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+      if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.studentHome);
     } on FirebaseAuthException catch (error) {
       _showError(error.message ?? 'Unable to sign in.');
     } catch (_) {
@@ -98,7 +98,9 @@ class _SignInState extends State<SignIn> {
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: _isSubmitting ? null : _signIn,
+                      onPressed: () {
+                        _isSubmitting ? null : _signIn();
+                      } ,
                       child: Text(_isSubmitting ? 'Signing in...' : 'Sign in'),
                     ),
                     const SizedBox(height: 12),

@@ -1,115 +1,47 @@
 import 'package:flutter/material.dart';
 
-class CustomBottomNavBar extends StatelessWidget {
-  const CustomBottomNavBar({super.key});
+import '../core/constants/colors.dart';
+
+class StudentBottomNavigationBar extends StatelessWidget {
+  const StudentBottomNavigationBar({
+    super.key,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  void _onItemTapped(int index) {
+    onSelected(index);
+  }
 
   @override
   Widget build(BuildContext context) {
-    const Color selectedColor = Color(0xFF2563EB);
-    const Color unselectedColor = Color(0xFF686B73);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(80),
-          bottomRight: Radius.circular(80),
+    return BottomNavigationBar(
+      currentIndex: selectedIndex,
+      onTap: _onItemTapped,
+      backgroundColor: AppColors.surface,
+      elevation: 0,
+      type: BottomNavigationBarType.fixed,
+      selectedItemColor: AppColors.primaryBlue,
+      unselectedItemColor: AppColors.secondaryText,
+      selectedFontSize: 14,
+      unselectedFontSize: 14,
+      showUnselectedLabels: true,
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.map_outlined),
+          label: 'Explore',
         ),
-        border: Border.all(
-          color: const Color(0xFFE5E5E5),
-          width: 1,
+        BottomNavigationBarItem(
+          icon: Icon(Icons.assignment_outlined),
+          label: 'My reports',
         ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 14,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _navItem(
-                    icon: Icons.home_outlined,
-                    label: 'Home',
-                    selected: true,
-                    selectedColor: selectedColor,
-                    unselectedColor: unselectedColor,
-                  ),
-                  _navItem(
-                    icon: Icons.map_outlined,
-                    label: 'Explore',
-                    selected: false,
-                    selectedColor: selectedColor,
-                    unselectedColor: unselectedColor,
-                  ),
-                  _navItem(
-                    icon: Icons.assignment_outlined,
-                    label: 'My reports',
-                    selected: false,
-                    selectedColor: selectedColor,
-                    unselectedColor: unselectedColor,
-                  ),
-                  _navItem(
-                    icon: Icons.account_circle_outlined,
-                    label: 'Profile',
-                    selected: false,
-                    selectedColor: selectedColor,
-                    unselectedColor: unselectedColor,
-                  ),
-                ],
-              ),
-            ),
-
-            // Bottom system-style indicator
-            Container(
-              width: 274,
-              height: 10,
-              margin: const EdgeInsets.only(
-                top: 14,
-                bottom: 22,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _navItem({
-    required IconData icon,
-    required String label,
-    required bool selected,
-    required Color selectedColor,
-    required Color unselectedColor,
-  }) {
-    final color = selected ? selectedColor : unselectedColor;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          size: 39,
-          color: color,
-          //strokeWidth: 1.5,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-            color: color,
-          ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.account_circle_outlined),
+          label: 'Profile',
         ),
       ],
     );
