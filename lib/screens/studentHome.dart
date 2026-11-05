@@ -146,7 +146,13 @@ class _StudentHomeContent extends StatelessWidget {
       ),
       bottomNavigationBar: StudentBottomNavigationBar(
         selectedIndex: provider.selectedIndex,
-        onSelected: provider.selectTab,
+        onSelected: (index) {
+          if (index == 1) {
+            Navigator.of(context).pushNamed(AppRoutes.exploreIssues);
+            return;
+          }
+          provider.selectTab(index);
+        },
       ),
     );
   }
