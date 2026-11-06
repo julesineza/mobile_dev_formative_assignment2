@@ -4,16 +4,18 @@ import 'package:flutter/foundation.dart';
 
 import '../core/constants/issue_category.dart';
 import '../core/constants/issue_status.dart';
+import '../core/constants/priority.dart';
 import '../models/issue.dart';
 import '../services/issue_service.dart';
 
 class ExploreIssuesProvider extends ChangeNotifier {
-  ExploreIssuesProvider({IssueService? issueService})
+  ExploreIssuesProvider({IssueService? issueService, this.sortByUrgency = false})
     : _issueService = issueService ?? IssueService() {
     _listenToIssues();
   }
 
   final IssueService _issueService;
+  final bool sortByUrgency;
   StreamSubscription<List<Issue>>? _issuesSubscription;
 
   List<Issue> _issues = const [];
@@ -22,6 +24,7 @@ class ExploreIssuesProvider extends ChangeNotifier {
   String _searchQuery = '';
   IssueCategory? _selectedCategory;
   IssueStatus? _selectedStatus;
+  Priority? _selectedPriority;
 
   List<Issue> get issues => _filteredIssues;
   bool get isLoading => _isLoading;
@@ -29,10 +32,11 @@ class ExploreIssuesProvider extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   IssueCategory? get selectedCategory => _selectedCategory;
   IssueStatus? get selectedStatus => _selectedStatus;
+  Priority? get selectedPriority => _selectedPriority;
 
   List<Issue> get _filteredIssues {
     final query = _searchQuery.trim().toLowerCase();
-    return _issues.where((issue) {
+    final filtered = _issues.where((issue) {
       final matchesSearch =
           query.isEmpty ||
           issue.title.toLowerCase().contains(query) ||
@@ -42,8 +46,20 @@ class ExploreIssuesProvider extends ChangeNotifier {
           _selectedCategory == null || issue.category == _selectedCategory;
       final matchesStatus =
           _selectedStatus == null || issue.status == _selectedStatus;
-      return matchesSearch && matchesCategory && matchesStatus;
+      final matchesPriority =
+          _selectedPriority == null || issue.priority == _selectedPriority;
+      return matchesSearch &&
+          matchesCategory &&
+          matchesStatus &&
+          matchesPriority;
     }).toList();
+    if (sortByUrgency) {
+      filtered.sort(
+        (first, second) =>
+            second.priority.index.compareTo(first.priority.index),
+      );
+    }
+    return filtered;
   }
 
   void updateSearchQuery(String value) {
@@ -61,10 +77,16 @@ class ExploreIssuesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void selectPriority(Priority? priority) {
+    _selectedPriority = priority;
+    notifyListeners();
+  }
+
   void clearFilters() {
     _searchQuery = '';
     _selectedCategory = null;
     _selectedStatus = null;
+    _selectedPriority = null;
     notifyListeners();
   }
 

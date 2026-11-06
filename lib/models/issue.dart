@@ -44,6 +44,7 @@ class Issue {
       title: map[FirestoreKeys.title] as String? ?? '',
       description: map[FirestoreKeys.description] as String? ?? '',
       category: IssueCategory.fromString(map[FirestoreKeys.category] as String?),
+      department: map[FirestoreKeys.department] as String?,
       status: IssueStatus.fromString(map[FirestoreKeys.status] as String?),
       priority: Priority.fromString(map[FirestoreKeys.priority] as String?),
       imageUrl: map[FirestoreKeys.imageUrl] as String?,

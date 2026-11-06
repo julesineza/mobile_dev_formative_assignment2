@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../app_routes.dart';
 import '../core/constants/colors.dart';
 import '../services/auth_service.dart';
+import '../services/user_service.dart';
+import '../core/constants/user_role.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -15,6 +17,7 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   final _formKey = GlobalKey<FormState>();
   final _authService = AuthService();
+  final _userService = UserService();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
@@ -31,11 +34,27 @@ class _SignInState extends State<SignIn> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
     try {
-      await _authService.signIn(
+      final user = await _authService.signIn(
         _emailController.text.trim(),
         _passwordController.text,
       );
-      if (mounted) Navigator.pushReplacementNamed(context, AppRoutes.studentHome);
+      if (user == null) {
+        throw const FormatException('Unable to identify this account.');
+      }
+      final profile = await _userService.getUser(user.uid);
+      if (profile == null) {
+        await _authService.signOut();
+        throw const FormatException('Your account profile could not be found.');
+      }
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(
+        context,
+        profile.role == UserRole.teacher
+            ? AppRoutes.staffDashboard
+            : AppRoutes.studentHome,
+      );
+    } on FormatException catch (error) {
+      _showError(error.message);
     } on FirebaseAuthException catch (error) {
       _showError(error.message ?? 'Unable to sign in.');
     } catch (_) {
@@ -47,7 +66,8 @@ class _SignInState extends State<SignIn> {
 
   void _showError(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -72,7 +92,8 @@ class _SignInState extends State<SignIn> {
                         labelText: 'School email',
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
-                      validator: (value) => value == null || value.trim().isEmpty
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
                           ? 'Enter your email'
                           : null,
                     ),
@@ -87,9 +108,11 @@ class _SignInState extends State<SignIn> {
                           onPressed: () => setState(
                             () => _isPasswordVisible = !_isPasswordVisible,
                           ),
-                          icon: Icon(_isPasswordVisible
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined),
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
                         ),
                       ),
                       validator: (value) => value == null || value.isEmpty
@@ -100,7 +123,7 @@ class _SignInState extends State<SignIn> {
                     ElevatedButton(
                       onPressed: () {
                         _isSubmitting ? null : _signIn();
-                      } ,
+                      },
                       child: Text(_isSubmitting ? 'Signing in...' : 'Sign in'),
                     ),
                     const SizedBox(height: 12),
@@ -150,7 +173,11 @@ class _AuthCard extends StatelessWidget {
               const CircleAvatar(
                 radius: 28,
                 backgroundColor: AppColors.primaryBlue,
-                child: Icon(Icons.school_outlined, color: Colors.white, size: 30),
+                child: Icon(
+                  Icons.school_outlined,
+                  color: Colors.white,
+                  size: 30,
+                ),
               ),
               const SizedBox(height: 24),
               Text(title, style: Theme.of(context).textTheme.headlineMedium),
@@ -187,7 +214,10 @@ class _AuthLink extends StatelessWidget {
         TextButton(
           onPressed: onPressed,
           style: TextButton.styleFrom(foregroundColor: AppColors.primaryBlue),
-          child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
         ),
       ],
     );
