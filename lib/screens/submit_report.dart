@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../core/constants/colors.dart';
 import '../core/constants/issue_category.dart';
 import '../core/constants/priority.dart';
+import '../providers/image_provider.dart';
 import '../providers/submit_report_provider.dart';
 
 class SubmitReport extends StatelessWidget {
@@ -45,14 +46,17 @@ class _SubmitReportFormState extends State<_SubmitReportForm> {
     if (!_formKey.currentState!.validate()) return;
 
     final provider = context.read<SubmitReportProvider>();
+    final imageProvider = context.read<ImageUploadProvider>();
     final submitted = await provider.submit(
       title: _titleController.text,
       description: _descriptionController.text,
       location: _locationController.text,
+      imageUrl: imageProvider.imageUrl,
     );
 
     if (!mounted) return;
     if (submitted) {
+      imageProvider.clearImage();
       Navigator.of(context).pop(true);
     } else if (provider.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -200,6 +204,11 @@ class _SubmitReportFormState extends State<_SubmitReportForm> {
                 ),
               ),
               const SizedBox(height: 24),
+              _ImageUploadCard(
+                imageProvider: context.watch<ImageUploadProvider>(),
+                enabled: !provider.isSubmitting,
+              ),
+              const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: provider.isSubmitting ? null : _submit,
                 icon: provider.isSubmitting
@@ -230,6 +239,78 @@ class _SubmitReportFormState extends State<_SubmitReportForm> {
     }
     return null;
   }
+}
+
+class _ImageUploadCard extends StatelessWidget {
+  const _ImageUploadCard({
+    required this.imageProvider,
+    required this.enabled,
+  });
+
+  final ImageUploadProvider imageProvider;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final imageUrl = imageProvider.imageUrl;
+    return _SectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+            Text(
+              'Evidence image',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: AppColors.text,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text('Add a photo that shows the issue (optional).'),
+            const SizedBox(height: 16),
+            if (imageUrl != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  imageUrl,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) =>
+                      const Center(child: Text('Image preview unavailable')),
+                ),
+              ),
+            if (imageUrl != null) const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: enabled && !imageProvider.isUploading
+                  ? imageProvider.pickAndUploadImage
+                  : null,
+              icon: imageProvider.isUploading
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.add_a_photo_outlined),
+              label: Text(
+                imageProvider.isUploading
+                    ? 'Uploading...'
+                    : imageUrl == null
+                    ? 'Choose image'
+                    : 'Choose another image',
+              ),
+            ),
+            if (imageProvider.errorMessage != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                imageProvider.errorMessage!,
+                style: TextStyle(color: AppColors.error),
+              ),
+            ],
+        ],
+      ),
+    );
+  }
+
 }
 
 class _SectionCard extends StatelessWidget {

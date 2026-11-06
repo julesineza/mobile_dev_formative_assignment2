@@ -1,17 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
-import '../core/constants/firestore_keys.dart';
 import '../core/constants/issue_status.dart';
 import '../core/constants/colors.dart';
 import '../models/issue.dart';
+import '../services/auth_service.dart';
+import '../services/issue_service.dart';
+import '../services/user_service.dart';
 
 class DashboardReport {
   const DashboardReport({
+    required this.issue,
     required this.title,
     required this.location,
     required this.status,
@@ -22,6 +23,7 @@ class DashboardReport {
     required this.statusBackground,
   });
 
+  final Issue issue;
   final String title;
   final String location;
   final String status;
@@ -33,19 +35,24 @@ class DashboardReport {
 }
 
 class StudentHomeProvider extends ChangeNotifier {
-  StudentHomeProvider({FirebaseAuth? auth, FirebaseFirestore? firestore})
-    : _auth = auth ?? FirebaseAuth.instance,
-      _firestore = firestore ?? FirebaseFirestore.instance {
-    _authSubscription = _auth.authStateChanges().listen(
+  StudentHomeProvider({
+    AuthService? authService,
+    IssueService? issueService,
+    UserService? userService,
+  }) : _authService = authService ?? AuthService(),
+       _issueService = issueService ?? IssueService(),
+       _userService = userService ?? UserService() {
+    _authSubscription = _authService.authStateChanges.listen(
       _handleAuthStateChanged,
     );
   }
 
-  final FirebaseAuth _auth;
-  final FirebaseFirestore _firestore;
-  StreamSubscription<User?>? _authSubscription;
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _issuesSubscription;
-  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _userSubscription;
+  final AuthService _authService;
+  final IssueService _issueService;
+  final UserService _userService;
+  StreamSubscription? _authSubscription;
+  StreamSubscription<List<Issue>>? _issuesSubscription;
+  StreamSubscription<String?>? _userSubscription;
 
   int _selectedIndex = 0;
   bool _isLoading = true;
@@ -77,7 +84,7 @@ class StudentHomeProvider extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
-    final user = _auth.currentUser;
+    final user = _authService.currentUser;
     if (user == null) {
       _errorMessage = 'Sign in to view your dashboard data.';
       _isLoading = false;
@@ -88,7 +95,7 @@ class StudentHomeProvider extends ChangeNotifier {
     _listenToIssues(user.uid);
   }
 
-  Future<void> _handleAuthStateChanged(User? user) async {
+  Future<void> _handleAuthStateChanged(AuthUser? user) async {
     await _issuesSubscription?.cancel();
     await _userSubscription?.cancel();
 
@@ -111,41 +118,19 @@ class StudentHomeProvider extends ChangeNotifier {
   }
 
   void _listenToUser(String uid) {
-    _userSubscription = _firestore
-        .collection(FirestoreKeys.users)
-        .doc(uid)
-        .snapshots()
-        .listen(
-          (snapshot) {
-            if (!snapshot.exists) return;
-            final data = snapshot.data();
-            if (data == null) return;
-            final name = (data[FirestoreKeys.name] as String?)?.trim();
-            if (name == null || name.isEmpty) return;
-            _studentName = _firstWord(name) ?? _studentName;
-            notifyListeners();
-          },
-          onError: (_) {
-            // Keep current fallback name if user profile fetch fails.
-          },
-        );
+    _userSubscription = _userService.watchUserName(uid).listen((name) {
+      if (name == null || name.isEmpty) return;
+      _studentName = _firstWord(name) ?? _studentName;
+      notifyListeners();
+    }, onError: (_) {});
   }
 
   void _listenToIssues(String uid) {
-    _issuesSubscription = _firestore
-        .collection(FirestoreKeys.issues)
-        .where(FirestoreKeys.reportedBy, isEqualTo: uid)
-        .snapshots()
+    _issuesSubscription = _issueService
+        .watchIssuesReportedBy(uid)
         .listen(
-          (snapshot) {
-            _issues =
-                snapshot.docs
-                    .map((doc) => Issue.fromMap(doc.data(), doc.id))
-                    .toList()
-                  ..sort(
-                    (first, second) =>
-                        second.createdAt.compareTo(first.createdAt),
-                  );
+          (issues) {
+            _issues = issues;
             _isLoading = false;
             _errorMessage = null;
             notifyListeners();
@@ -190,6 +175,7 @@ class StudentHomeProvider extends ChangeNotifier {
         : issue.location;
 
     return DashboardReport(
+      issue: issue,
       title: title,
       location: location,
       status: issue.status.label,

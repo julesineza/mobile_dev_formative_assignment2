@@ -146,7 +146,13 @@ class _StudentHomeContent extends StatelessWidget {
       ),
       bottomNavigationBar: StudentBottomNavigationBar(
         selectedIndex: provider.selectedIndex,
-        onSelected: provider.selectTab,
+        onSelected: (index) {
+          if (index == 1) {
+            Navigator.of(context).pushNamed(AppRoutes.exploreIssues);
+            return;
+          }
+          provider.selectTab(index);
+        },
       ),
     );
   }
@@ -286,14 +292,20 @@ class ReportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(23),
+    return InkWell(
+      borderRadius: BorderRadius.circular(23),
+      onTap: () => Navigator.of(context).pushNamed(
+        AppRoutes.reportDetails,
+        arguments: report.issue,
       ),
-      child: Row(
+      child: Ink(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(23),
+        ),
+        child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
@@ -360,6 +372,7 @@ class ReportCard extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

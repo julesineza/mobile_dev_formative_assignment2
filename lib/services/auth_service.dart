@@ -5,11 +5,26 @@ import '../core/constants/firestore_keys.dart';
 import '../core/constants/user_role.dart';
 import '../models/app_user.dart';
 
-class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+class AuthUser {
+  const AuthUser({required this.uid, this.displayName});
 
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  final String uid;
+  final String? displayName;
+}
+
+class AuthService {
+  AuthService({FirebaseAuth? auth, FirebaseFirestore? firestore})
+    : _auth = auth ?? FirebaseAuth.instance,
+      _firestore = firestore ?? FirebaseFirestore.instance;
+
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
+
+  Stream<AuthUser?> get authStateChanges {
+    return _auth.authStateChanges().map(_toAuthUser);
+  }
+
+  AuthUser? get currentUser => _toAuthUser(_auth.currentUser);
 
   Future<AppUser> register({
     required String name,
@@ -67,5 +82,10 @@ class AuthService {
   // Sign out
   Future<void> signOut() async {
     await _auth.signOut();
+  }
+
+  AuthUser? _toAuthUser(User? user) {
+    if (user == null) return null;
+    return AuthUser(uid: user.uid, displayName: user.displayName);
   }
 }
