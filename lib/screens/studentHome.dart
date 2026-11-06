@@ -66,33 +66,32 @@ class _StudentHomeContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 28),
                     const _ReportPromptCard(),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 24),
                     Text(
                       'Your impact',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            color: AppColors.text,
-                            fontWeight: FontWeight.w400,
-                          ),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppColors.text,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     _ImpactCard(provider: provider),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Recent reports',
-                          style: Theme.of(context).textTheme.headlineSmall
+                          style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(
                                 color: AppColors.text,
-                                fontWeight: FontWeight.w400,
+                                fontWeight: FontWeight.w700,
                               ),
                         ),
                         TextButton(
-                          onPressed: () => Navigator.of(
-                            context,
-                          ).pushNamed(AppRoutes.myReports),
+                          onPressed: () =>
+                              Navigator.of(context)
+                                  .pushNamed(AppRoutes.myReports),
                           child: const Text('View all'),
                         ),
                       ],
@@ -173,44 +172,71 @@ class _ReportPromptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(23),
-      ),
-      child: Column(
-        children: [
-          Row(children: [const SizedBox(width: 17)]),
-          const SizedBox(height: 22),
-          SizedBox(
-            width: double.infinity,
-            height: 73,
-            child: ElevatedButton(
-              onPressed: () async {
-                final submitted = await Navigator.of(context)
-                    .pushNamed(AppRoutes.submitReport);
-                if (!context.mounted || submitted != true) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Your report was submitted.')),
-                );
-              },
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.add, size: 25),
-                  SizedBox(width: 12),
-                  Text(
-                    'Report an issue',
-                    style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
+    return Semantics(
+      container: true,
+      label: 'Report a campus issue',
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(23),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryBackground,
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                ],
+                  child: const Icon(
+                    Icons.campaign_outlined,
+                    color: AppColors.primaryBlue,
+                    size: 25,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    'Help keep campus moving',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Share what you notice with the campus team. '
+              'A clear location and a few details help them follow up.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  final submitted = await Navigator.of(context)
+                      .pushNamed(AppRoutes.submitReport);
+                  if (!context.mounted || submitted != true) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Your report was submitted.')),
+                  );
+                },
+                icon: const Icon(Icons.add, size: 23),
+                label: const Text('Report an issue'),
               ),
             ),
-          ),
-          const SizedBox(height: 21),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -273,24 +299,28 @@ class ImpactItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          number,
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-            color: color,
-            fontSize: 37,
-            fontWeight: FontWeight.w400,
+    return Semantics(
+      label: '$number $label',
+      excludeSemantics: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            number,
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+              color: color,
+              fontSize: 37,
+              fontWeight: FontWeight.w400,
+            ),
           ),
-        ),
-        const SizedBox(height: 5),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall
-              ?.copyWith(color: AppColors.secondaryText),
-        ),
-      ],
+          const SizedBox(height: 5),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: AppColors.secondaryText),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -304,10 +334,9 @@ class ReportCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(23),
-      onTap: () => Navigator.of(context).pushNamed(
-        AppRoutes.reportDetails,
-        arguments: report.issue,
-      ),
+      onTap: () =>
+          Navigator.of(context)
+              .pushNamed(AppRoutes.reportDetails, arguments: report.issue),
       child: Ink(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
@@ -316,72 +345,76 @@ class ReportCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(23),
         ),
         child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 54,
-            width: 54,
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(15),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 54,
+              width: 54,
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Icon(
+                report.icon,
+                color: AppColors.secondaryText,
+                size: 27,
+              ),
             ),
-            child: Icon(report.icon, color: AppColors.secondaryText, size: 27),
-          ),
-          const SizedBox(width: 17),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  report.title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.text,
-                    fontSize: 19,
-                    fontWeight: FontWeight.w600,
+            const SizedBox(width: 17),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    report.title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.text,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  report.location,
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: AppColors.secondaryText),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 11,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: report.statusBackground,
-                        borderRadius: BorderRadius.circular(9),
-                      ),
-                      child: Text(
-                        report.status,
-                        style: TextStyle(
-                          color: report.statusColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                  const SizedBox(height: 10),
+                  Text(
+                    report.location,
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: AppColors.secondaryText),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 11,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: report.statusBackground,
+                          borderRadius: BorderRadius.circular(9),
+                        ),
+                        child: Text(
+                          report.status,
+                          style: TextStyle(
+                            color: report.statusColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
-                    Flexible(
-                      child: Text(
-                        '${report.reportNumber} · ${report.reportDate}',
-                        textAlign: TextAlign.end,
-                        style: Theme.of(context).textTheme.labelSmall
-                            ?.copyWith(color: AppColors.secondaryText),
+                      Flexible(
+                        child: Text(
+                          '${report.reportNumber} · ${report.reportDate}',
+                          textAlign: TextAlign.end,
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(color: AppColors.secondaryText),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
         ),
       ),
     );
