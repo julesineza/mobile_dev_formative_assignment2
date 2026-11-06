@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
 
 import 'app_routes.dart';
 import 'core/constants/app_theme.dart';
+import 'providers/image_provider.dart';
 import 'screens/welcome.dart';
 
 void main() async {
@@ -26,11 +28,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      home: const WelcomeScreen(),
-      routes: AppRoutes.routes,
+    return ChangeNotifierProvider(
+      create: (_) => ImageUploadProvider(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        home: const WelcomeScreen(),
+        routes: AppRoutes.routes,
+      ),
     );
   }
 }

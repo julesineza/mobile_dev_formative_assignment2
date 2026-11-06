@@ -12,6 +12,7 @@ import '../services/user_service.dart';
 
 class DashboardReport {
   const DashboardReport({
+    required this.issue,
     required this.title,
     required this.location,
     required this.status,
@@ -22,6 +23,7 @@ class DashboardReport {
     required this.statusBackground,
   });
 
+  final Issue issue;
   final String title;
   final String location;
   final String status;
@@ -173,6 +175,7 @@ class StudentHomeProvider extends ChangeNotifier {
         : issue.location;
 
     return DashboardReport(
+      issue: issue,
       title: title,
       location: location,
       status: issue.status.label,

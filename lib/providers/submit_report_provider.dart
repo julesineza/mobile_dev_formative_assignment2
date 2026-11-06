@@ -41,6 +41,7 @@ class SubmitReportProvider extends ChangeNotifier {
     required String title,
     required String description,
     required String location,
+    String? imageUrl,
   }) async {
     final user = _authService.currentUser;
     if (user == null) {
@@ -62,6 +63,7 @@ class SubmitReportProvider extends ChangeNotifier {
       location: location.trim(),
       status: IssueStatus.submitted,
       priority: _selectedPriority,
+      imageUrl: imageUrl,
       reportedBy: user.uid,
       createdAt: now,
       updatedAt: now,

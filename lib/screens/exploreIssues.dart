@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../core/constants/colors.dart';
 import '../core/constants/issue_category.dart';
 import '../core/constants/issue_status.dart';
+import '../app_routes.dart';
 import '../models/issue.dart';
 import '../providers/explore_issues_provider.dart';
 import '../widgets/navbar.dart';
@@ -272,40 +273,9 @@ class _IssueCard extends StatelessWidget {
   }
 
   void _showDetails(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              issue.title.trim().isEmpty ? 'Untitled issue' : issue.title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: AppColors.text,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _StatusBadge(status: issue.status),
-            const SizedBox(height: 18),
-            Text(issue.description, style: Theme.of(context).textTheme.bodyLarge),
-            const SizedBox(height: 18),
-            Text(
-              'Reported at ${issue.location}',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              DateFormat('MMMM d, y').format(issue.createdAt),
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
-      ),
+    Navigator.of(context).pushNamed(
+      AppRoutes.reportDetails,
+      arguments: issue,
     );
   }
 }
