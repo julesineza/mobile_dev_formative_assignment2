@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../core/constants/user_role.dart';
+import '../core/constants/staff_access.dart';
 import '../core/constants/colors.dart';
 import '../services/auth_service.dart';
 import '../app_routes.dart';
@@ -20,6 +21,7 @@ class _SignUpState extends State<SignUp> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _accessCodeController = TextEditingController();
   UserRole _selectedRole = UserRole.student;
   bool _isSubmitting = false;
   bool _isPasswordVisible = false;
@@ -31,11 +33,22 @@ class _SignUpState extends State<SignUp> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _accessCodeController.dispose();
     super.dispose();
   }
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
+    final accessCode = _accessCodeController.text.trim();
+    if (_selectedRole == UserRole.teacher &&
+        accessCode != StaffAccess.accessCode) {
+      _showError('A valid staff access code is required for staff accounts.');
+      return;
+    }
+    if (_selectedRole == UserRole.student && accessCode.isNotEmpty) {
+      _showError('Remove the staff access code or select the Staff role.');
+      return;
+    }
 
     setState(() => _isSubmitting = true);
     try {
@@ -115,6 +128,17 @@ class _SignUpState extends State<SignUp> {
                                   value.trim().isEmpty
                               ? 'Enter your name'
                               : null,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _accessCodeController,
+                          textCapitalization: TextCapitalization.characters,
+                          decoration: const InputDecoration(
+                            labelText: 'Staff access code (optional)',
+                            prefixIcon: Icon(Icons.key_outlined),
+                            helperText:
+                                'Required only when registering as Staff.',
+                          ),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(

@@ -57,7 +57,7 @@ class WelcomeScreen extends StatelessWidget {
                   height: 1.4,
                 ),
               ),
-              
+
               const SizedBox(height: 45),
               SizedBox(
                 width: double.infinity,
@@ -117,7 +117,6 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-
             ],
           ),
         ),

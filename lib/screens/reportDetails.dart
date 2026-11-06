@@ -6,11 +6,18 @@ import '../core/constants/colors.dart';
 import '../core/constants/issue_status.dart';
 import '../models/issue.dart';
 import '../providers/image_provider.dart';
+import '../services/auth_service.dart';
+import '../services/issue_service.dart';
 
 class ReportDetails extends StatelessWidget {
-  const ReportDetails({required this.issue, super.key});
+  const ReportDetails({
+    required this.issue,
+    this.staffMode = false,
+    super.key,
+  });
 
   final Issue issue;
+  final bool staffMode;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +38,10 @@ class ReportDetails extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _StatusBadge(status: issue.status),
+          if (staffMode) ...[
+            const SizedBox(height: 18),
+            _StaffStatusButton(issue: issue),
+          ],
           const SizedBox(height: 24),
           if (imageUrl != null)
             ClipRRect(
@@ -92,6 +103,89 @@ class ReportDetails extends StatelessWidget {
           const SizedBox(height: 16),
           _StatusTimeline(issue: issue),
         ],
+      ),
+    );
+  }
+
+}
+
+class _StaffStatusButton extends StatelessWidget {
+  const _StaffStatusButton({required this.issue});
+
+  final Issue issue;
+
+  Future<void> _selectStatus(BuildContext context) async {
+    final status = await showModalBottomSheet<IssueStatus>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: IssueStatus.values
+              .map(
+                (status) => ListTile(
+                  title: Text(status.label),
+                  leading: Icon(
+                    status == issue.status
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off,
+                  ),
+                  onTap: () => Navigator.pop(context, status),
+                ),
+              )
+              .toList(),
+        ),
+      ),
+    );
+    if (status == null || !context.mounted) return;
+
+    final staffUid = AuthService().currentUser?.uid;
+    if (staffUid == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Your staff session has expired.')),
+      );
+      return;
+    }
+
+    try {
+      final updated = await IssueService().updateStatusIfUnassigned(
+        issueId: issue.id,
+        status: status,
+        staffUid: staffUid,
+      );
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            updated
+                ? 'Issue status updated.'
+                : 'This issue is already assigned to another staff member.',
+          ),
+        ),
+      );
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to update this issue.')),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final assignedToAnotherStaff =
+        issue.resolvedBy != null &&
+        issue.resolvedBy != AuthService().currentUser?.uid;
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: assignedToAnotherStaff ? null : () => _selectStatus(context),
+        icon: const Icon(Icons.edit_outlined),
+        label: Text(
+          assignedToAnotherStaff
+              ? 'Assigned to another staff member'
+              : 'Update status',
+        ),
       ),
     );
   }

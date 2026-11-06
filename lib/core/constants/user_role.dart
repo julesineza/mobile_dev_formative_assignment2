@@ -1,6 +1,6 @@
 enum UserRole {
   student('student', 'Student'),
-  teacher('teacher', 'Teacher');
+  teacher('teacher', 'Staff');
 
   const UserRole(this.value, this.label);
 
