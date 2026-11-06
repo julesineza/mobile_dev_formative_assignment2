@@ -84,6 +84,14 @@ class AuthService {
     await _auth.signOut();
   }
 
+  Future<void> updatePassword(String password) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw StateError('No signed-in user was found.');
+    }
+    await user.updatePassword(password);
+  }
+
   AuthUser? _toAuthUser(User? user) {
     if (user == null) return null;
     return AuthUser(uid: user.uid, displayName: user.displayName);

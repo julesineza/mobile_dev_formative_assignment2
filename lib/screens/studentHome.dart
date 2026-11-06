@@ -157,6 +157,10 @@ class _StudentHomeContent extends StatelessWidget {
             Navigator.of(context).pushNamed(AppRoutes.myReports);
             return;
           }
+          if (index == 3) {
+            Navigator.of(context).pushNamed(AppRoutes.profile);
+            return;
+          }
           provider.selectTab(index);
         },
       ),

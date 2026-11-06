@@ -81,6 +81,8 @@ class _MyReportsContent extends StatelessWidget {
             Navigator.of(context).pushReplacementNamed(AppRoutes.studentHome);
           } else if (index == 1) {
             Navigator.of(context).pushNamed(AppRoutes.exploreIssues);
+          } else if (index == 3) {
+            Navigator.of(context).pushNamed(AppRoutes.profile);
           }
         },
       ),

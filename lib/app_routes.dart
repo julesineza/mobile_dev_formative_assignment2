@@ -9,6 +9,7 @@ import 'screens/exploreIssues.dart';
 import 'screens/reportDetails.dart';
 import 'screens/staff_dashboard.dart';
 import 'screens/my_reports.dart';
+import 'screens/profile.dart';
 import 'models/issue.dart';
 
 class AppRoutes {
@@ -22,6 +23,7 @@ class AppRoutes {
   static const String staffDashboard = '/staffDashboard';
   static const String staffReportDetails = '/staffReportDetails';
   static const String myReports = '/myReports';
+  static const String profile = '/profile';
 
   static final Map<String, WidgetBuilder> routes = {
     signIn: (context) => const SignIn(),
@@ -39,5 +41,6 @@ class AppRoutes {
       staffMode: true,
     ),
     myReports: (context) => const MyReports(),
+    profile: (context) => const Profile(),
   };
 }
