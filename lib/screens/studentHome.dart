@@ -90,7 +90,9 @@ class _StudentHomeContent extends StatelessWidget {
                               ),
                         ),
                         TextButton(
-                          onPressed: () => provider.selectTab(2),
+                          onPressed: () => Navigator.of(
+                            context,
+                          ).pushNamed(AppRoutes.myReports),
                           child: const Text('View all'),
                         ),
                       ],
@@ -149,6 +151,10 @@ class _StudentHomeContent extends StatelessWidget {
         onSelected: (index) {
           if (index == 1) {
             Navigator.of(context).pushNamed(AppRoutes.exploreIssues);
+            return;
+          }
+          if (index == 2) {
+            Navigator.of(context).pushNamed(AppRoutes.myReports);
             return;
           }
           provider.selectTab(index);

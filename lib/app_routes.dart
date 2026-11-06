@@ -8,6 +8,7 @@ import 'screens/submit_report.dart';
 import 'screens/exploreIssues.dart';
 import 'screens/reportDetails.dart';
 import 'screens/staff_dashboard.dart';
+import 'screens/my_reports.dart';
 import 'models/issue.dart';
 
 class AppRoutes {
@@ -20,6 +21,7 @@ class AppRoutes {
   static const String reportDetails = '/reportDetails';
   static const String staffDashboard = '/staffDashboard';
   static const String staffReportDetails = '/staffReportDetails';
+  static const String myReports = '/myReports';
 
   static final Map<String, WidgetBuilder> routes = {
     signIn: (context) => const SignIn(),
@@ -36,5 +38,6 @@ class AppRoutes {
       issue: ModalRoute.of(context)!.settings.arguments! as Issue,
       staffMode: true,
     ),
+    myReports: (context) => const MyReports(),
   };
 }

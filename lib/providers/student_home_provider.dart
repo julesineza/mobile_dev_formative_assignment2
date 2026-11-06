@@ -71,6 +71,10 @@ class StudentHomeProvider extends ChangeNotifier {
     return _issues.take(_maxDashboardReports).map(_toDashboardReport).toList();
   }
 
+  List<DashboardReport> get allReports {
+    return _issues.map(_toDashboardReport).toList();
+  }
+
   int get reportsMade => _issues.length;
   int get activeReports =>
       _issues.where((issue) => issue.status != IssueStatus.resolved).length;
