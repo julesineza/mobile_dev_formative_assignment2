@@ -88,7 +88,13 @@ class _ExploreIssuesContent extends StatelessWidget {
       bottomNavigationBar: StudentBottomNavigationBar(
         selectedIndex: 1,
         onSelected: (index) {
-          if (index == 0) Navigator.of(context).pop();
+          if (index == 0) {
+            Navigator.of(context).pop();
+          } else if (index == 2) {
+            Navigator.of(context).pushNamed(AppRoutes.myReports);
+          } else if (index == 3) {
+            Navigator.of(context).pushNamed(AppRoutes.profile);
+          }
         },
       ),
     );
