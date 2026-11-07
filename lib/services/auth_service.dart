@@ -34,9 +34,9 @@ class AuthService {
     required String password,
     required UserRole role,
   }) async {
-    if (!isAluEmail(email)) {
+    if (role == UserRole.student && !isAluEmail(email)) {
       throw const FormatException(
-        'Use your ALU email address ending in @alustudent.com.',
+        'Student accounts must use an ALU email ending in @alustudent.com.',
       );
     }
 
@@ -82,12 +82,6 @@ class AuthService {
   }
 
   Future<User?> signUp(String email, String password) async {
-    if (!isAluEmail(email)) {
-      throw const FormatException(
-        'Use your ALU email address ending in @alustudent.com.',
-      );
-    }
-
     final userCredential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
@@ -100,12 +94,6 @@ class AuthService {
   }
 
   Future<User?> signIn(String email, String password) async {
-    if (!isAluEmail(email)) {
-      throw const FormatException(
-        'Use your ALU email address ending in @alustudent.com.',
-      );
-    }
-
     final userCredential = await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,

@@ -63,7 +63,7 @@ class _SignUpState extends State<SignUp> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Account created. Check your ALU email and verify it before signing in.',
+            'Account created. Check your email and verify it before signing in.',
           ),
         ),
       );
@@ -79,7 +79,8 @@ class _SignUpState extends State<SignUp> {
 
   void _showError(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -130,8 +131,8 @@ class _SignUpState extends State<SignUp> {
                             labelText: 'Name',
                             prefixIcon: Icon(Icons.person_outline),
                           ),
-                          validator: (value) => value == null ||
-                                  value.trim().isEmpty
+                          validator: (value) =>
+                              value == null || value.trim().isEmpty
                               ? 'Enter your name'
                               : null,
                         ),
@@ -154,10 +155,11 @@ class _SignUpState extends State<SignUp> {
                             labelText: 'School email',
                             prefixIcon: Icon(Icons.email_outlined),
                           ),
-                          validator: (value) => value == null ||
-                                  value.trim().isEmpty
+                          validator: (value) =>
+                              value == null || value.trim().isEmpty
                               ? 'Enter your email'
-                              : !AuthService.isAluEmail(value)
+                              : _selectedRole == UserRole.student &&
+                                    !AuthService.isAluEmail(value)
                               ? 'Use an ALU email ending in @alustudent.com'
                               : null,
                         ),
@@ -195,12 +197,15 @@ class _SignUpState extends State<SignUp> {
                               onPressed: () => setState(
                                 () => _isPasswordVisible = !_isPasswordVisible,
                               ),
-                              icon: Icon(_isPasswordVisible
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined),
+                              icon: Icon(
+                                _isPasswordVisible
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
+                              ),
                             ),
                           ),
-                          validator: (value) => value == null || value.length < 6
+                          validator: (value) =>
+                              value == null || value.length < 6
                               ? 'Password must be at least 6 characters'
                               : null,
                         ),
@@ -216,12 +221,15 @@ class _SignUpState extends State<SignUp> {
                                 () => _isConfirmPasswordVisible =
                                     !_isConfirmPasswordVisible,
                               ),
-                              icon: Icon(_isConfirmPasswordVisible
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined),
+                              icon: Icon(
+                                _isConfirmPasswordVisible
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
+                              ),
                             ),
                           ),
-                          validator: (value) => value != _passwordController.text
+                          validator: (value) =>
+                              value != _passwordController.text
                               ? 'Passwords do not match'
                               : null,
                         ),

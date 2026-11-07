@@ -48,7 +48,7 @@ class _SignInState extends State<SignIn> {
           await _authService.signOut();
         }
         throw const FormatException(
-          'Verify your ALU email before signing in. A new verification email was sent.',
+          'Verify your email before signing in. A new verification email was sent.',
         );
       }
       final profile = await _userService.getUser(user.uid);
@@ -105,8 +105,6 @@ class _SignInState extends State<SignIn> {
                       validator: (value) =>
                           value == null || value.trim().isEmpty
                           ? 'Enter your email'
-                          : !AuthService.isAluEmail(value)
-                          ? 'Use an ALU email ending in @alustudent.com'
                           : null,
                     ),
                     const SizedBox(height: 16),
