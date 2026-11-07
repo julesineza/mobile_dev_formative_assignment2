@@ -13,6 +13,8 @@ class AuthUser {
 }
 
 class AuthService {
+  static const String allowedEmailDomain = 'alustudent.com';
+
   AuthService({FirebaseAuth? auth, FirebaseFirestore? firestore})
     : _auth = auth ?? FirebaseAuth.instance,
       _firestore = firestore ?? FirebaseFirestore.instance;
@@ -32,6 +34,12 @@ class AuthService {
     required String password,
     required UserRole role,
   }) async {
+    if (!isAluEmail(email)) {
+      throw const FormatException(
+        'Use your ALU email address ending in @alustudent.com.',
+      );
+    }
+
     final userCredential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
@@ -41,6 +49,8 @@ class AuthService {
     if (firebaseUser == null) {
       throw StateError('Firebase did not return a user after registration.');
     }
+
+    await firebaseUser.sendEmailVerification();
 
     final appUser = AppUser(
       uid: firebaseUser.uid,
@@ -63,20 +73,52 @@ class AuthService {
     return appUser;
   }
 
+  static bool isAluEmail(String email) {
+    final normalizedEmail = email.trim().toLowerCase();
+    final atIndex = normalizedEmail.indexOf('@');
+    return atIndex > 0 &&
+        atIndex == normalizedEmail.lastIndexOf('@') &&
+        normalizedEmail.substring(atIndex + 1) == allowedEmailDomain;
+  }
+
   Future<User?> signUp(String email, String password) async {
+    if (!isAluEmail(email)) {
+      throw const FormatException(
+        'Use your ALU email address ending in @alustudent.com.',
+      );
+    }
+
     final userCredential = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    final user = userCredential.user;
+    if (user != null) {
+      await user.sendEmailVerification();
+    }
+    return user;
+  }
+
+  Future<User?> signIn(String email, String password) async {
+    if (!isAluEmail(email)) {
+      throw const FormatException(
+        'Use your ALU email address ending in @alustudent.com.',
+      );
+    }
+
+    final userCredential = await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
     return userCredential.user;
   }
 
-  Future<User?> signIn(String email, String password) async {
-    final userCredential = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    return userCredential.user;
+  Future<void> resendEmailVerification() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw StateError('No signed-in user was found.');
+    }
+    await user.sendEmailVerification();
   }
 
   // Sign out

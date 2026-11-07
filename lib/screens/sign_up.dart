@@ -59,9 +59,15 @@ class _SignUpState extends State<SignUp> {
         role: _selectedRole,
       );
       if (!mounted) return;
+      await _authService.signOut();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Account created successfully.')),
+        const SnackBar(
+          content: Text(
+            'Account created. Check your ALU email and verify it before signing in.',
+          ),
+        ),
       );
+      Navigator.pushReplacementNamed(context, AppRoutes.signIn);
     } on FirebaseAuthException catch (error) {
       _showError(error.message ?? 'Unable to create the account.');
     } catch (_) {
@@ -151,6 +157,8 @@ class _SignUpState extends State<SignUp> {
                           validator: (value) => value == null ||
                                   value.trim().isEmpty
                               ? 'Enter your email'
+                              : !AuthService.isAluEmail(value)
+                              ? 'Use an ALU email ending in @alustudent.com'
                               : null,
                         ),
                         const SizedBox(height: 16),
