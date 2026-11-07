@@ -50,7 +50,9 @@ class AuthService {
       throw StateError('Firebase did not return a user after registration.');
     }
 
-    await firebaseUser.sendEmailVerification();
+    if (role == UserRole.student) {
+      await firebaseUser.sendEmailVerification();
+    }
 
     final appUser = AppUser(
       uid: firebaseUser.uid,

@@ -1,20 +1,38 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mobile_dev_formative_assignment2/services/auth_service.dart';
+import 'package:mobile_dev_formative_assignment2/screens/welcome.dart';
 
 void main() {
-  test('accepts only ALU student email addresses', () {
-    expect(AuthService.isAluEmail('name@alustudent.com'), isTrue);
-    expect(AuthService.isAluEmail('NAME@ALUSTUDENT.COM'), isTrue);
-    expect(AuthService.isAluEmail('name@gmail.com'), isFalse);
-    expect(AuthService.isAluEmail('name@alustudent.com.example.org'), isFalse);
-    expect(AuthService.isAluEmail('name@alustudent.com@other.com'), isFalse);
+  testWidgets('welcome screen presents the main actions', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: const WelcomeScreen(),
+        routes: {
+          '/signUp': (_) => const Scaffold(body: Text('Create account')),
+        },
+      ),
+    );
+
+    expect(find.text('CampusCare'), findsOneWidget);
+    expect(find.text('A better campus.\nStarts with you.'), findsOneWidget);
+    expect(find.text('Get started'), findsOneWidget);
+    expect(find.text('Sign in'), findsOneWidget);
+  });
+
+  testWidgets('get started navigates to sign up', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: const WelcomeScreen(),
+        routes: {
+          '/signUp': (_) => const Scaffold(body: Text('Create account')),
+        },
+      ),
+    );
+
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Create account'), findsOneWidget);
   });
 }

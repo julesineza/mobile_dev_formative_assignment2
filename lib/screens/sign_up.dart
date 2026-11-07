@@ -61,9 +61,11 @@ class _SignUpState extends State<SignUp> {
       if (!mounted) return;
       await _authService.signOut();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Account created. Check your email and verify it before signing in.',
+            _selectedRole == UserRole.student
+                ? 'Account created. Check your email and verify it before signing in.'
+                : 'Staff account created. You can sign in immediately.',
           ),
         ),
       );

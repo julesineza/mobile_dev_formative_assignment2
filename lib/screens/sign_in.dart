@@ -41,7 +41,12 @@ class _SignInState extends State<SignIn> {
       if (user == null) {
         throw const FormatException('Unable to identify this account.');
       }
-      if (!user.emailVerified) {
+      final profile = await _userService.getUser(user.uid);
+      if (profile == null) {
+        await _authService.signOut();
+        throw const FormatException('Your account profile could not be found.');
+      }
+      if (profile.role == UserRole.student && !user.emailVerified) {
         try {
           await _authService.resendEmailVerification();
         } finally {
@@ -50,11 +55,6 @@ class _SignInState extends State<SignIn> {
         throw const FormatException(
           'Verify your email before signing in. A new verification email was sent.',
         );
-      }
-      final profile = await _userService.getUser(user.uid);
-      if (profile == null) {
-        await _authService.signOut();
-        throw const FormatException('Your account profile could not be found.');
       }
       if (!mounted) return;
       Navigator.pushReplacementNamed(
